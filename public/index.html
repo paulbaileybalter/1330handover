@@ -133,6 +133,20 @@
   }
   .field input:focus{border-color:var(--teal); outline:none;}
   .metabar .sep{width:1px; height:20px; background:var(--line);}
+  .field-check{
+    gap:9px; padding:6px 10px; border-radius:9px; border:1.5px solid transparent;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .field-check.checked{background:rgba(71,215,172,.18); border-color:var(--teal);}
+  .field-check label{
+    display:flex; align-items:center; gap:8px; cursor:pointer;
+    font-family:var(--font-body); font-size:14px; font-weight:600; color:var(--ink);
+    text-transform:none; letter-spacing:normal;
+  }
+  .field-check.checked label{color:#0f5c42;}
+  .field-check input[type=checkbox]{
+    width:17px; height:17px; accent-color:var(--teal); cursor:pointer; flex:0 0 auto;
+  }
 
   /* ---------- Main grid ---------- */
   main{
@@ -373,6 +387,10 @@
   <div class="field"><label>Start</label><input id="f-start" type="time"></div>
   <div class="sep"></div>
   <div class="field"><label>Finish</label><input id="f-finish" type="time"></div>
+  <div class="sep"></div>
+  <div class="field field-check" id="physchemField">
+    <label><input type="checkbox" id="f-physchem"><span>Daily Physchem Discussion</span></label>
+  </div>
 </div>
 
 <main>
@@ -576,7 +594,7 @@
     var priorityTasks = {};
     TASK_TYPES.forEach(function(t){ priorityTasks[t.key] = {checked:false, notes:""}; });
     return {
-      lead:"", date:todayStr(), start:"", finish:"",
+      lead:"", date:todayStr(), start:"", finish:"", physchemDiscussion:false,
       safety:"",
       lab:"",
       workload:{status:"none"},
@@ -646,6 +664,8 @@
     qs('#f-date').value = state.date||'';
     qs('#f-start').value = state.start||'';
     qs('#f-finish').value = state.finish||'';
+    qs('#f-physchem').checked = !!state.physchemDiscussion;
+    qs('#physchemField').classList.toggle('checked', !!state.physchemDiscussion);
     qs('#f-safety').value = state.safety||'';
     qs('#f-comments').value = state.comments||'';
     qs('#f-lab').value = state.lab||'';
@@ -741,6 +761,11 @@
   bindText('#f-date','date');
   bindText('#f-start','start');
   bindText('#f-finish','finish');
+  qs('#f-physchem').addEventListener('change', function(e){
+    state.physchemDiscussion = e.target.checked;
+    qs('#physchemField').classList.toggle('checked', e.target.checked);
+    markDirty();
+  });
   bindText('#f-safety','safety');
   bindText('#f-comments','comments');
   bindText('#f-lab','lab');
@@ -829,7 +854,8 @@
       '<span><strong>Lead:</strong> '+escapeHtml(state.lead||'—')+'</span>' +
       '<span><strong>Date:</strong> '+escapeHtml(state.date||'—')+'</span>' +
       '<span><strong>Start:</strong> '+escapeHtml(state.start||'—')+'</span>' +
-      '<span><strong>Finish:</strong> '+escapeHtml(state.finish||'—')+'</span>';
+      '<span><strong>Finish:</strong> '+escapeHtml(state.finish||'—')+'</span>' +
+      '<span><strong>Daily Physchem Discussion:</strong> '+(state.physchemDiscussion ? '☑ Yes' : '☐ No')+'</span>';
 
     var html =
       '<h1>13:30 Handover Meeting</h1>' +
@@ -866,6 +892,7 @@
     var lines = [
       '13:30 HANDOVER MEETING',
       'Lead: '+(state.lead||'—')+'   Date: '+(state.date||'—')+'   Start: '+(state.start||'—')+'   Finish: '+(state.finish||'—'),
+      'Daily Physchem Discussion: '+(state.physchemDiscussion ? 'Yes' : 'No'),
       ''
     ];
     if((state.safety||'').trim()){ lines.push('SAFETY', state.safety, ''); }
@@ -923,13 +950,22 @@
       + '<tr>'
       + metaCell('Lead', state.lead) + metaCell('Date', state.date)
       + metaCell('Start', state.start) + metaCell('Finish', state.finish)
-      + '</tr></table>';
+      + '</tr>'
+      + '<tr><td colspan="4" style="padding-top:8px;">'
+      + metaCellPlain('Daily Physchem Discussion', state.physchemDiscussion ? 'Yes' : 'No')
+      + '</td></tr>'
+      + '</table>';
 
     function metaCell(label, value){
       return '<td style="padding:0 18px 0 0;font-family:'+FONT+';">'
         + '<div style="font-family:'+MONO+';font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#7a776c;">'+label+'</div>'
         + '<div style="font-family:'+FONT+';font-size:14px;font-weight:600;color:#0B0B0C;">'+escapeHtml(value||'—')+'</div>'
         + '</td>';
+    }
+
+    function metaCellPlain(label, value){
+      return '<div style="font-family:'+MONO+';font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#7a776c;">'+label+'</div>'
+        + '<div style="font-family:'+FONT+';font-size:14px;font-weight:600;color:#0B0B0C;">'+escapeHtml(value)+'</div>';
     }
 
     var LOGO_B64 = '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';
