@@ -255,6 +255,22 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
+    // --- Fail loudly and clearly if required secrets aren't actually set,
+    //     instead of letting a blank/missing value crash inside crypto.subtle
+    //     with a cryptic "Imported HMAC key length (0)..." error later on. ---
+    const missing = [];
+    if (!env.SITE_PASSWORD) missing.push("SITE_PASSWORD");
+    if (!env.SESSION_SECRET) missing.push("SESSION_SECRET");
+    if (missing.length) {
+      return new Response(
+        `Configuration error: the following Worker secret(s) are missing or blank: ${missing.join(", ")}.\n\n` +
+          `Go to your Worker's Settings → Variables and Secrets, delete any existing entry for ${missing.join(
+            " / "
+          )}, and re-add it as type Secret with a real value (make sure the value field actually has text in it before saving).`,
+        { status: 500, headers: { "Content-Type": "text/plain; charset=UTF-8" } }
+      );
+    }
+
     // --- Login route: always reachable, never itself gated ---
     if (path === "/login") {
       if (request.method === "GET") {
