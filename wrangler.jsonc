@@ -16,7 +16,7 @@
     {
       "binding": "RUNSHEET_KV",
       // Replace with the Namespace ID from Workers & Pages → KV → your namespace.
-      "id": "handover-runsheet-kv"
+      "id": "c524db0a8ced4cfab96c67aa47fcd200"
     }
   ],
   "observability": {
