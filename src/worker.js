@@ -6,17 +6,18 @@
  *      Nothing — not even static files — is served without a valid session,
  *      except the /login route itself (or the cookie would never be
  *      obtainable in the first place).
- *   2. Proxy multi-device sync calls to JSONBin.io under /api/sync, so the
- *      real JSONBin API key and Bin ID never reach the browser. The client
- *      only ever talks to same-origin /api/sync.
+ *   2. Handle multi-device sync at /api/sync by reading/writing a single key
+ *      in a Cloudflare KV namespace — no third-party service, no API key to
+ *      leak to the browser, since KV is bound directly to this Worker.
  *   3. Once authenticated, fall through to the static assets in ./public
  *      via the ASSETS binding for everything else.
  *
  * Required Worker secrets (Settings → Variables and Secrets, type "Secret"):
- *   SITE_PASSWORD    - the shared password everyone types in to get in
- *   SESSION_SECRET    - random string used to HMAC-sign session cookies
- *   JSONBIN_BIN_ID    - the JSONBin.io Bin ID holding the run sheet JSON
- *   JSONBIN_API_KEY   - JSONBin.io X-Master-Key
+ *   SITE_PASSWORD     - the shared password everyone types in to get in
+ *   SESSION_SECRET     - random string used to HMAC-sign session cookies
+ *
+ * Required binding (set via wrangler.jsonc, see kv_namespaces there):
+ *   RUNSHEET_KV        - the KV namespace holding the run sheet JSON
  */
 
 const COOKIE_NAME = "session";
@@ -210,52 +211,32 @@ function escapeHtml(s) {
 }
 
 // ---------------------------------------------------------------------------
-// JSONBin sync proxy
+// KV-backed sync
 // ---------------------------------------------------------------------------
 
-async function handleSync(request, env) {
-  const binId = env.JSONBIN_BIN_ID;
-  const apiKey = env.JSONBIN_API_KEY;
+const KV_KEY = "state";
 
+async function handleSync(request, env) {
   if (request.method === "GET") {
-    const upstream = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
-      headers: { "X-Master-Key": apiKey, "X-Bin-Meta": "false" },
+    const value = await env.RUNSHEET_KV.get(KV_KEY);
+    return new Response(value == null ? "null" : value, {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
     });
-    if (upstream.status === 404) {
-      return new Response("null", { status: 200, headers: { "Content-Type": "application/json" } });
-    }
-    if (!upstream.ok) {
-      return new Response(JSON.stringify({ error: "sync read failed" }), {
-        status: 502,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-    const body = await upstream.text();
-    return new Response(body, { status: 200, headers: { "Content-Type": "application/json" } });
   }
 
   if (request.method === "PUT" || request.method === "POST") {
     let payload;
     try {
       payload = await request.text();
-      JSON.parse(payload); // validate it's actually JSON before forwarding
+      JSON.parse(payload); // validate it's actually JSON before storing
     } catch (e) {
       return new Response(JSON.stringify({ error: "invalid JSON body" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
     }
-    const upstream = await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "X-Master-Key": apiKey },
-      body: payload,
-    });
-    if (!upstream.ok) {
-      return new Response(JSON.stringify({ error: "sync write failed" }), {
-        status: 502,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
+    await env.RUNSHEET_KV.put(KV_KEY, payload);
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
