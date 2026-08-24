@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   // Rename this to whatever you want the Cloudflare Worker project to be called.
-  "name": "handover-runsheet",
+  "name": "1330handover",
   "main": "src/worker.js",
   // Bump this to today's date if you fork/reuse this config later.
   "compatibility_date": "2026-08-01",
