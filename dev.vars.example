@@ -1,0 +1,9 @@
+# Copy this file to .dev.vars (gitignored) and fill in real values for local
+# `wrangler dev` testing. Never commit .dev.vars — these are the same secrets
+# that live in the Cloudflare dashboard for the deployed Worker.
+#
+# Note: the KV namespace itself is configured in wrangler.jsonc, not here —
+# local `wrangler dev` uses a simulated local KV store automatically.
+
+SITE_PASSWORD=change-me
+SESSION_SECRET=change-me-to-a-long-random-string
