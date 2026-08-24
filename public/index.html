@@ -357,6 +357,7 @@
     <h1>13:30 Handover Meeting</h1>
   </div>
   <div class="spacer"></div>
+  <span class="pill" id="syncPill" title="Sync status"><span class="dot" id="syncDot"></span><span id="syncLabel">Connecting…</span></span>
   <div class="actions">
     <button class="btn ghost" id="resetBtn" title="Clear the sheet for a new meeting">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 1 3 6.7"/><path d="M3 20v-5h5"/></svg>
@@ -626,7 +627,10 @@
   function qs(sel){ return document.querySelector(sel); }
 
   function setSyncStatus(mode, label){
-    // Sync status pill removed from the UI — sync itself still runs in the background.
+    var dot = document.getElementById('syncDot');
+    if(!dot) return;
+    dot.className = 'dot' + (mode ? ' '+mode : '');
+    document.getElementById('syncLabel').textContent = label;
   }
 
   async function remoteGet(){
@@ -1062,6 +1066,7 @@
       dirty = false;
       setSyncStatus('live', 'Live — synced');
     }catch(e){
+      console.error('[sync] push failed:', e);
       setSyncStatus('local', 'Offline — saved on this device');
     }
   }
@@ -1080,6 +1085,7 @@
       }
       setSyncStatus('live', 'Live — synced');
     }catch(e){
+      console.error('[sync] poll failed:', e);
       setSyncStatus('local', 'Offline — saved on this device');
     }
   }
@@ -1109,6 +1115,7 @@
       setSyncStatus('live', 'Live — synced');
       markDirty();
     }catch(e){
+      console.error('[sync] initial sync failed:', e);
       setSyncStatus('local', 'Offline — saved on this device');
     }
 
