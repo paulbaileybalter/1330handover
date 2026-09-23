@@ -153,8 +153,9 @@
     display:grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-areas:
-      "safety lab side"
-      "production comments side"
+      "safety lab packaging"
+      "production maintenance comments"
+      "workload priority priority"
       "attendance attendance attendance";
     align-items:stretch;
     gap:16px;
@@ -162,19 +163,19 @@
   }
   #card-safety{grid-area:safety;}
   #card-lab{grid-area:lab;}
+  #card-packaging{grid-area:packaging;}
   #card-production{grid-area:production;}
+  #card-maintenance{grid-area:maintenance;}
   #card-comments{grid-area:comments;}
+  #card-workload{grid-area:workload; align-self:start;}
+  #card-priority{grid-area:priority;}
   #card-attendance{grid-area:attendance;}
-  .side-stack{
-    grid-area:side; align-self:start;
-    display:flex; flex-direction:column; gap:16px; min-width:0;
-  }
   .card{
     background:#fff; border:1px solid var(--line); border-radius:var(--radius);
     box-shadow:var(--shadow); display:flex; flex-direction:column;
     overflow:hidden; position:relative;
   }
-  #card-safety, #card-lab, #card-production, #card-comments, #card-priority{min-height:380px;}
+  #card-safety, #card-lab, #card-packaging, #card-production, #card-maintenance, #card-comments, #card-priority{min-height:380px;}
   .card > .bar{height:4px; flex:0 0 auto;}
   .card .head{
     display:flex; align-items:center; gap:8px; padding:12px 16px 8px; flex:0 0 auto;
@@ -197,6 +198,8 @@
   #card-workload .bar{background:var(--orange);}
   #card-priority .bar{background:var(--purple);}
   #card-lab .bar{background:var(--sky);}
+  #card-packaging .bar{background:var(--orange);}
+  #card-maintenance .bar{background:var(--pale);}
   #card-comments .bar{background:#D8CC5A;}
   #card-production .bar{background:var(--gold);}
   #card-attendance .bar{background:var(--purple);}
@@ -299,12 +302,15 @@
       grid-template-areas:
         "safety"
         "lab"
-        "side"
+        "packaging"
         "production"
+        "maintenance"
         "comments"
+        "workload"
+        "priority"
         "attendance";
     }
-    #card-safety, #card-lab, #card-production, #card-comments, #card-priority{min-height:0;}
+    #card-safety, #card-lab, #card-packaging, #card-production, #card-maintenance, #card-comments, #card-priority{min-height:0;}
   }
 
   @media (max-width: 640px){
@@ -334,8 +340,10 @@
     .print-sheet .s-workload h3{border-color:#c97a2c;}
     .print-sheet .s-priority h3{border-color:#7566A0;}
     .print-sheet .s-lab h3{border-color:#3f8ba3;}
+    .print-sheet .s-packaging h3{border-color:#b4650b;}
     .print-sheet .s-comments h3{border-color:#a89412;}
     .print-sheet .s-production h3{border-color:#a3860a;}
+    .print-sheet .s-maintenance h3{border-color:#8a6d00;}
     .print-sheet .s-attendance h3{border-color:#000;}
     .print-sheet p{font-size:11.5px; line-height:1.55; margin:0; white-space:pre-wrap;}
     .print-sheet .ps-attendees{display:flex; flex-wrap:wrap; gap:6px 16px; padding:0; margin:0; list-style:none;}
@@ -413,49 +421,14 @@
     <div class="body"><textarea class="note" id="f-lab" placeholder="Gravity readings, pH, QC results…"></textarea></div>
   </section>
 
-  <div class="side-stack">
-    <section class="card" id="card-workload">
-      <div class="bar"></div>
-      <div class="head">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#FDAA63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
-        <h2>Workload</h2>
-      </div>
-      <div class="body">
-        <div class="workload-opts" id="workloadOpts">
-          <button class="workload-opt" data-v="none"><span class="swatch"></span>No problem</button>
-          <button class="workload-opt" data-v="consistent"><span class="swatch"></span>Consistent</button>
-          <button class="workload-opt" data-v="busy"><span class="swatch"></span>Going to be busy</button>
-        </div>
-      </div>
-    </section>
-
-    <section class="card" id="card-priority">
-      <div class="bar"></div>
-      <div class="head">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#7566A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-        <h2>Prioritized tasks</h2>
-      </div>
-      <div class="body">
-        <div class="task-list" id="taskList">
-          <label class="task-row" data-task="transfer"><input type="checkbox" class="task-check"><span class="task-label">Transfer</span><input type="text" class="task-note" placeholder="Details…"></label>
-          <label class="task-row" data-task="cipFV"><input type="checkbox" class="task-check"><span class="task-label">CIP FV</span><input type="text" class="task-note" placeholder="Details…"></label>
-          <label class="task-row" data-task="cipBBT"><input type="checkbox" class="task-check"><span class="task-label">CIP BBT</span><input type="text" class="task-note" placeholder="Details…"></label>
-          <label class="task-row" data-task="cipGBLine"><input type="checkbox" class="task-check"><span class="task-label">CIP GB Line</span><input type="text" class="task-note" placeholder="Details…"></label>
-          <label class="task-row" data-task="cipYeastLine"><input type="checkbox" class="task-check"><span class="task-label">CIP Yeast Line</span><input type="text" class="task-note" placeholder="Details…"></label>
-          <label class="task-row" data-task="cipBrewhouse"><input type="checkbox" class="task-check"><span class="task-label">CIP Brewhouse</span><input type="text" class="task-note" placeholder="Details…"></label>
-          <label class="task-row" data-task="acidWash"><input type="checkbox" class="task-check"><span class="task-label">Acid Wash</span><input type="text" class="task-note" placeholder="Details…"></label>
-          <label class="task-row" data-task="tempDrop"><input type="checkbox" class="task-check"><span class="task-label">Temp Drop</span><input type="text" class="task-note" placeholder="Details…"></label>
-          <label class="task-row" data-task="yeastOff"><input type="checkbox" class="task-check"><span class="task-label">Yeast Off</span><input type="text" class="task-note" placeholder="Details…"></label>
-          <label class="task-row" data-task="dryHop"><input type="checkbox" class="task-check"><span class="task-label">Dry Hop</span><input type="text" class="task-note" placeholder="Details…"></label>
-          <label class="task-row" data-task="millIn"><input type="checkbox" class="task-check"><span class="task-label">Mill In</span><input type="text" class="task-note" placeholder="Details…"></label>
-          <label class="task-row" data-task="cleaning"><input type="checkbox" class="task-check"><span class="task-label">Cleaning</span><input type="text" class="task-note" placeholder="Details…"></label>
-          <label class="task-row" data-task="sops"><input type="checkbox" class="task-check"><span class="task-label">SOPs</span><input type="text" class="task-note" placeholder="Details…"></label>
-          <label class="task-row" data-task="grainBills"><input type="checkbox" class="task-check"><span class="task-label">Make up grain bills</span><input type="text" class="task-note" placeholder="Details…"></label>
-          <label class="task-row" data-task="other"><input type="checkbox" class="task-check"><span class="task-label">Other</span><input type="text" class="task-note" placeholder="Details…"></label>
-        </div>
-      </div>
-    </section>
-  </div>
+  <section class="card" id="card-packaging">
+    <div class="bar"></div>
+    <div class="head">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#B4650B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="1.5"/><path d="M3 8 12 3l9 5"/><path d="M12 12v9"/></svg>
+      <h2>Packaging</h2>
+    </div>
+    <div class="body"><textarea class="note" id="f-packaging" placeholder="Runs, changeovers, downtime, stock…"></textarea></div>
+  </section>
 
   <!-- KPI section paused (may be restored later) — markup kept here for easy re-enabling.
   <section class="card full" id="card-kpi">
@@ -501,9 +474,18 @@
     <div class="bar"></div>
     <div class="head">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#B69200" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l5-5 5 5v12"/><path d="M14 21v-7l4-4 2 2v9"/></svg>
-      <h2>Production / Maintenance / Planning</h2>
+      <h2>Production / Planning</h2>
     </div>
-    <div class="body"><textarea class="note" id="f-production" placeholder="Batches, downtime, upcoming jobs…"></textarea></div>
+    <div class="body"><textarea class="note" id="f-production" placeholder="Batches, planning, upcoming jobs…"></textarea></div>
+  </section>
+
+  <section class="card" id="card-maintenance">
+    <div class="bar"></div>
+    <div class="head">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#a3860a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 1 5.4-5.4l-3.5 3.5-2-2 3.5-3.5Z"/></svg>
+      <h2>Maintenance</h2>
+    </div>
+    <div class="body"><textarea class="note" id="f-maintenance" placeholder="Breakdowns, repairs, scheduled work…"></textarea></div>
   </section>
 
   <section class="card" id="card-comments">
@@ -513,6 +495,48 @@
       <h2>Comments / issues — next 24 hrs</h2>
     </div>
     <div class="body"><textarea class="note" id="f-comments" placeholder="Anything the next shift needs to know…"></textarea></div>
+  </section>
+
+  <section class="card" id="card-workload">
+    <div class="bar"></div>
+    <div class="head">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#FDAA63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+      <h2>Workload</h2>
+    </div>
+    <div class="body">
+      <div class="workload-opts" id="workloadOpts">
+        <button class="workload-opt" data-v="none"><span class="swatch"></span>No problem</button>
+        <button class="workload-opt" data-v="consistent"><span class="swatch"></span>Consistent</button>
+        <button class="workload-opt" data-v="busy"><span class="swatch"></span>Going to be busy</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="card-priority">
+    <div class="bar"></div>
+    <div class="head">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#7566A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <h2>Prioritized tasks</h2>
+    </div>
+    <div class="body">
+      <div class="task-list" id="taskList">
+        <label class="task-row" data-task="transfer"><input type="checkbox" class="task-check"><span class="task-label">Transfer</span><input type="text" class="task-note" placeholder="Details…"></label>
+        <label class="task-row" data-task="cipFV"><input type="checkbox" class="task-check"><span class="task-label">CIP FV</span><input type="text" class="task-note" placeholder="Details…"></label>
+        <label class="task-row" data-task="cipBBT"><input type="checkbox" class="task-check"><span class="task-label">CIP BBT</span><input type="text" class="task-note" placeholder="Details…"></label>
+        <label class="task-row" data-task="cipGBLine"><input type="checkbox" class="task-check"><span class="task-label">CIP GB Line</span><input type="text" class="task-note" placeholder="Details…"></label>
+        <label class="task-row" data-task="cipYeastLine"><input type="checkbox" class="task-check"><span class="task-label">CIP Yeast Line</span><input type="text" class="task-note" placeholder="Details…"></label>
+        <label class="task-row" data-task="cipBrewhouse"><input type="checkbox" class="task-check"><span class="task-label">CIP Brewhouse</span><input type="text" class="task-note" placeholder="Details…"></label>
+        <label class="task-row" data-task="acidWash"><input type="checkbox" class="task-check"><span class="task-label">Acid Wash</span><input type="text" class="task-note" placeholder="Details…"></label>
+        <label class="task-row" data-task="tempDrop"><input type="checkbox" class="task-check"><span class="task-label">Temp Drop</span><input type="text" class="task-note" placeholder="Details…"></label>
+        <label class="task-row" data-task="yeastOff"><input type="checkbox" class="task-check"><span class="task-label">Yeast Off</span><input type="text" class="task-note" placeholder="Details…"></label>
+        <label class="task-row" data-task="dryHop"><input type="checkbox" class="task-check"><span class="task-label">Dry Hop</span><input type="text" class="task-note" placeholder="Details…"></label>
+        <label class="task-row" data-task="millIn"><input type="checkbox" class="task-check"><span class="task-label">Mill In</span><input type="text" class="task-note" placeholder="Details…"></label>
+        <label class="task-row" data-task="cleaning"><input type="checkbox" class="task-check"><span class="task-label">Cleaning</span><input type="text" class="task-note" placeholder="Details…"></label>
+        <label class="task-row" data-task="sops"><input type="checkbox" class="task-check"><span class="task-label">SOPs</span><input type="text" class="task-note" placeholder="Details…"></label>
+        <label class="task-row" data-task="grainBills"><input type="checkbox" class="task-check"><span class="task-label">Make up grain bills</span><input type="text" class="task-note" placeholder="Details…"></label>
+        <label class="task-row" data-task="other"><input type="checkbox" class="task-check"><span class="task-label">Other</span><input type="text" class="task-note" placeholder="Details…"></label>
+      </div>
+    </div>
   </section>
 
   <section class="card" id="card-attendance">
@@ -598,6 +622,8 @@
       lead:"", date:todayStr(), start:"", finish:"", physchemDiscussion:false,
       safety:"",
       lab:"",
+      packaging:"",
+      maintenance:"",
       workload:{status:"none"},
       priorityTasks:priorityTasks,
       comments:"",
@@ -673,6 +699,8 @@
     qs('#f-safety').value = state.safety||'';
     qs('#f-comments').value = state.comments||'';
     qs('#f-lab').value = state.lab||'';
+    qs('#f-packaging').value = state.packaging||'';
+    qs('#f-maintenance').value = state.maintenance||'';
     qs('#f-production').value = state.production||'';
     document.querySelectorAll('.task-row').forEach(function(row){
       var key = row.dataset.task;
@@ -773,6 +801,8 @@
   bindText('#f-safety','safety');
   bindText('#f-comments','comments');
   bindText('#f-lab','lab');
+  bindText('#f-packaging','packaging');
+  bindText('#f-maintenance','maintenance');
   bindText('#f-production','production');
   document.querySelectorAll('.task-row').forEach(function(row){
     var key = row.dataset.task;
@@ -866,7 +896,9 @@
       '<div class="ps-meta">'+metaHtml+'</div>' +
       '<section class="s-safety"><h3>Safety</h3><p>'+escapeHtml(state.safety||'None noted')+'</p></section>' +
       '<section class="s-lab"><h3>Lab</h3><p>'+escapeHtml(state.lab||'None noted')+'</p></section>' +
-      '<section class="s-production"><h3>Production / Maintenance / Planning</h3><p>'+escapeHtml(state.production||'None noted')+'</p></section>' +
+      '<section class="s-packaging"><h3>Packaging</h3><p>'+escapeHtml(state.packaging||'None noted')+'</p></section>' +
+      '<section class="s-production"><h3>Production / Planning</h3><p>'+escapeHtml(state.production||'None noted')+'</p></section>' +
+      '<section class="s-maintenance"><h3>Maintenance</h3><p>'+escapeHtml(state.maintenance||'None noted')+'</p></section>' +
       '<section class="s-workload"><h3>Workload</h3><p>'+escapeHtml(workloadLabel)+'</p></section>' +
       '<section class="s-comments"><h3>Comments / issues — next 24 hrs</h3><p>'+escapeHtml(state.comments||'None noted')+'</p></section>' +
       '<section class="s-priority"><h3>Prioritized tasks</h3><ul class="ps-attendees">'+tasksHtml+'</ul></section>' +
@@ -901,7 +933,9 @@
     ];
     if((state.safety||'').trim()){ lines.push('SAFETY', state.safety, ''); }
     if((state.lab||'').trim()){ lines.push('LAB', state.lab, ''); }
-    if((state.production||'').trim()){ lines.push('PRODUCTION / MAINTENANCE / PLANNING', state.production, ''); }
+    if((state.packaging||'').trim()){ lines.push('PACKAGING', state.packaging, ''); }
+    if((state.production||'').trim()){ lines.push('PRODUCTION / PLANNING', state.production, ''); }
+    if((state.maintenance||'').trim()){ lines.push('MAINTENANCE', state.maintenance, ''); }
     if(workloadLabel){ lines.push('WORKLOAD: '+workloadLabel, ''); }
     if((state.comments||'').trim()){ lines.push('COMMENTS / ISSUES — NEXT 24 HRS', state.comments, ''); }
     if(taskLines){ lines.push('PRIORITIZED TASKS', taskLines, ''); }
@@ -992,11 +1026,17 @@
     if((state.lab||'').trim()){
       sections += card('Lab', '#99D6EA', '<div '+p+'>'+escapeHtml(state.lab)+'</div>');
     }
+    if((state.packaging||'').trim()){
+      sections += card('Packaging', '#FDAA63', '<div '+p+'>'+escapeHtml(state.packaging)+'</div>');
+    }
     if(workloadLabel){
       sections += card('Workload', '#FDAA63', '<div '+p+'>'+escapeHtml(workloadLabel)+'</div>');
     }
     if((state.production||'').trim()){
-      sections += card('Production / Maintenance / Planning', '#FFD637', '<div '+p+'>'+escapeHtml(state.production)+'</div>');
+      sections += card('Production / Planning', '#FFD637', '<div '+p+'>'+escapeHtml(state.production)+'</div>');
+    }
+    if((state.maintenance||'').trim()){
+      sections += card('Maintenance', '#F1EB9C', '<div '+p+'>'+escapeHtml(state.maintenance)+'</div>');
     }
     if((state.comments||'').trim()){
       sections += card('Comments / issues — next 24 hrs', '#D8CC5A', '<div '+p+'>'+escapeHtml(state.comments)+'</div>');
