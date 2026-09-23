@@ -153,9 +153,9 @@
     display:grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-areas:
-      "safety lab packaging"
-      "production maintenance comments"
-      "workload priority priority"
+      "safety lab side"
+      "packaging production side"
+      "maintenance comments side"
       "attendance attendance attendance";
     align-items:stretch;
     gap:16px;
@@ -167,15 +167,17 @@
   #card-production{grid-area:production;}
   #card-maintenance{grid-area:maintenance;}
   #card-comments{grid-area:comments;}
-  #card-workload{grid-area:workload; align-self:start;}
-  #card-priority{grid-area:priority;}
   #card-attendance{grid-area:attendance;}
+  .side-stack{
+    grid-area:side; align-self:start;
+    display:flex; flex-direction:column; gap:16px; min-width:0;
+  }
   .card{
     background:#fff; border:1px solid var(--line); border-radius:var(--radius);
     box-shadow:var(--shadow); display:flex; flex-direction:column;
     overflow:hidden; position:relative;
   }
-  #card-safety, #card-lab, #card-packaging, #card-production, #card-maintenance, #card-comments, #card-priority{min-height:380px;}
+  #card-safety, #card-lab, #card-packaging, #card-production, #card-maintenance, #card-comments{min-height:220px;}
   .card > .bar{height:4px; flex:0 0 auto;}
   .card .head{
     display:flex; align-items:center; gap:8px; padding:12px 16px 8px; flex:0 0 auto;
@@ -306,11 +308,10 @@
         "production"
         "maintenance"
         "comments"
-        "workload"
-        "priority"
+        "side"
         "attendance";
     }
-    #card-safety, #card-lab, #card-packaging, #card-production, #card-maintenance, #card-comments, #card-priority{min-height:0;}
+    #card-safety, #card-lab, #card-packaging, #card-production, #card-maintenance, #card-comments{min-height:0;}
   }
 
   @media (max-width: 640px){
@@ -497,47 +498,49 @@
     <div class="body"><textarea class="note" id="f-comments" placeholder="Anything the next shift needs to know…"></textarea></div>
   </section>
 
-  <section class="card" id="card-workload">
-    <div class="bar"></div>
-    <div class="head">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#FDAA63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
-      <h2>Workload</h2>
-    </div>
-    <div class="body">
-      <div class="workload-opts" id="workloadOpts">
-        <button class="workload-opt" data-v="none"><span class="swatch"></span>No problem</button>
-        <button class="workload-opt" data-v="consistent"><span class="swatch"></span>Consistent</button>
-        <button class="workload-opt" data-v="busy"><span class="swatch"></span>Going to be busy</button>
+  <div class="side-stack">
+    <section class="card" id="card-workload">
+      <div class="bar"></div>
+      <div class="head">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#FDAA63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+        <h2>Workload</h2>
       </div>
-    </div>
-  </section>
+      <div class="body">
+        <div class="workload-opts" id="workloadOpts">
+          <button class="workload-opt" data-v="none"><span class="swatch"></span>No problem</button>
+          <button class="workload-opt" data-v="consistent"><span class="swatch"></span>Consistent</button>
+          <button class="workload-opt" data-v="busy"><span class="swatch"></span>Going to be busy</button>
+        </div>
+      </div>
+    </section>
 
-  <section class="card" id="card-priority">
-    <div class="bar"></div>
-    <div class="head">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#7566A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      <h2>Prioritized tasks</h2>
-    </div>
-    <div class="body">
-      <div class="task-list" id="taskList">
-        <label class="task-row" data-task="transfer"><input type="checkbox" class="task-check"><span class="task-label">Transfer</span><input type="text" class="task-note" placeholder="Details…"></label>
-        <label class="task-row" data-task="cipFV"><input type="checkbox" class="task-check"><span class="task-label">CIP FV</span><input type="text" class="task-note" placeholder="Details…"></label>
-        <label class="task-row" data-task="cipBBT"><input type="checkbox" class="task-check"><span class="task-label">CIP BBT</span><input type="text" class="task-note" placeholder="Details…"></label>
-        <label class="task-row" data-task="cipGBLine"><input type="checkbox" class="task-check"><span class="task-label">CIP GB Line</span><input type="text" class="task-note" placeholder="Details…"></label>
-        <label class="task-row" data-task="cipYeastLine"><input type="checkbox" class="task-check"><span class="task-label">CIP Yeast Line</span><input type="text" class="task-note" placeholder="Details…"></label>
-        <label class="task-row" data-task="cipBrewhouse"><input type="checkbox" class="task-check"><span class="task-label">CIP Brewhouse</span><input type="text" class="task-note" placeholder="Details…"></label>
-        <label class="task-row" data-task="acidWash"><input type="checkbox" class="task-check"><span class="task-label">Acid Wash</span><input type="text" class="task-note" placeholder="Details…"></label>
-        <label class="task-row" data-task="tempDrop"><input type="checkbox" class="task-check"><span class="task-label">Temp Drop</span><input type="text" class="task-note" placeholder="Details…"></label>
-        <label class="task-row" data-task="yeastOff"><input type="checkbox" class="task-check"><span class="task-label">Yeast Off</span><input type="text" class="task-note" placeholder="Details…"></label>
-        <label class="task-row" data-task="dryHop"><input type="checkbox" class="task-check"><span class="task-label">Dry Hop</span><input type="text" class="task-note" placeholder="Details…"></label>
-        <label class="task-row" data-task="millIn"><input type="checkbox" class="task-check"><span class="task-label">Mill In</span><input type="text" class="task-note" placeholder="Details…"></label>
-        <label class="task-row" data-task="cleaning"><input type="checkbox" class="task-check"><span class="task-label">Cleaning</span><input type="text" class="task-note" placeholder="Details…"></label>
-        <label class="task-row" data-task="sops"><input type="checkbox" class="task-check"><span class="task-label">SOPs</span><input type="text" class="task-note" placeholder="Details…"></label>
-        <label class="task-row" data-task="grainBills"><input type="checkbox" class="task-check"><span class="task-label">Make up grain bills</span><input type="text" class="task-note" placeholder="Details…"></label>
-        <label class="task-row" data-task="other"><input type="checkbox" class="task-check"><span class="task-label">Other</span><input type="text" class="task-note" placeholder="Details…"></label>
+    <section class="card" id="card-priority">
+      <div class="bar"></div>
+      <div class="head">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#7566A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <h2>Prioritized tasks</h2>
       </div>
-    </div>
-  </section>
+      <div class="body">
+        <div class="task-list" id="taskList">
+          <label class="task-row" data-task="transfer"><input type="checkbox" class="task-check"><span class="task-label">Transfer</span><input type="text" class="task-note" placeholder="Details…"></label>
+          <label class="task-row" data-task="cipFV"><input type="checkbox" class="task-check"><span class="task-label">CIP FV</span><input type="text" class="task-note" placeholder="Details…"></label>
+          <label class="task-row" data-task="cipBBT"><input type="checkbox" class="task-check"><span class="task-label">CIP BBT</span><input type="text" class="task-note" placeholder="Details…"></label>
+          <label class="task-row" data-task="cipGBLine"><input type="checkbox" class="task-check"><span class="task-label">CIP GB Line</span><input type="text" class="task-note" placeholder="Details…"></label>
+          <label class="task-row" data-task="cipYeastLine"><input type="checkbox" class="task-check"><span class="task-label">CIP Yeast Line</span><input type="text" class="task-note" placeholder="Details…"></label>
+          <label class="task-row" data-task="cipBrewhouse"><input type="checkbox" class="task-check"><span class="task-label">CIP Brewhouse</span><input type="text" class="task-note" placeholder="Details…"></label>
+          <label class="task-row" data-task="acidWash"><input type="checkbox" class="task-check"><span class="task-label">Acid Wash</span><input type="text" class="task-note" placeholder="Details…"></label>
+          <label class="task-row" data-task="tempDrop"><input type="checkbox" class="task-check"><span class="task-label">Temp Drop</span><input type="text" class="task-note" placeholder="Details…"></label>
+          <label class="task-row" data-task="yeastOff"><input type="checkbox" class="task-check"><span class="task-label">Yeast Off</span><input type="text" class="task-note" placeholder="Details…"></label>
+          <label class="task-row" data-task="dryHop"><input type="checkbox" class="task-check"><span class="task-label">Dry Hop</span><input type="text" class="task-note" placeholder="Details…"></label>
+          <label class="task-row" data-task="millIn"><input type="checkbox" class="task-check"><span class="task-label">Mill In</span><input type="text" class="task-note" placeholder="Details…"></label>
+          <label class="task-row" data-task="cleaning"><input type="checkbox" class="task-check"><span class="task-label">Cleaning</span><input type="text" class="task-note" placeholder="Details…"></label>
+          <label class="task-row" data-task="sops"><input type="checkbox" class="task-check"><span class="task-label">SOPs</span><input type="text" class="task-note" placeholder="Details…"></label>
+          <label class="task-row" data-task="grainBills"><input type="checkbox" class="task-check"><span class="task-label">Make up grain bills</span><input type="text" class="task-note" placeholder="Details…"></label>
+          <label class="task-row" data-task="other"><input type="checkbox" class="task-check"><span class="task-label">Other</span><input type="text" class="task-note" placeholder="Details…"></label>
+        </div>
+      </div>
+    </section>
+  </div>
 
   <section class="card" id="card-attendance">
     <div class="bar"></div>
