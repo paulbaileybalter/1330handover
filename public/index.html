@@ -1033,22 +1033,22 @@
       sections += card('Packaging', '#FDAA63', '<div '+p+'>'+escapeHtml(state.packaging)+'</div>');
     }
     if(workloadLabel){
-      sections += card('Workload', '#FDAA63', '<div '+p+'>'+escapeHtml(workloadLabel)+'</div>');
+      sections += card('Workload', '#47D7AC', '<div '+p+'>'+escapeHtml(workloadLabel)+'</div>');
     }
     if((state.production||'').trim()){
       sections += card('Production / Planning', '#FFD637', '<div '+p+'>'+escapeHtml(state.production)+'</div>');
     }
     if((state.maintenance||'').trim()){
-      sections += card('Maintenance', '#F1EB9C', '<div '+p+'>'+escapeHtml(state.maintenance)+'</div>');
+      sections += card('Maintenance', '#7566A0', '<div '+p+'>'+escapeHtml(state.maintenance)+'</div>');
     }
     if((state.comments||'').trim()){
-      sections += card('Comments / issues — next 24 hrs', '#D8CC5A', '<div '+p+'>'+escapeHtml(state.comments)+'</div>');
+      sections += card('Comments / issues — next 24 hrs', '#0B0B0C', '<div '+p+'>'+escapeHtml(state.comments)+'</div>');
     }
     if(checkedTasks.length){
-      sections += card('Prioritized tasks — selected', '#7566A0', taskItems);
+      sections += card('Prioritized tasks — selected', '#99D6EA', taskItems);
     }
     if(presentAttendees.length){
-      sections += card('Attendance — present', '#7566A0', attendanceItems);
+      sections += card('Attendance — present', '#FDAA63', attendanceItems);
     }
     if(!sections){
       sections = '<div '+muted+'>Nothing has been filled in yet.</div>';
